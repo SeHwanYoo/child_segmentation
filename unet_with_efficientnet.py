@@ -1,8 +1,10 @@
 # from tensorflow.keras.layers import Conv2D, BatchNormalization, Activation, MaxPool2D, Conv2DTranspose, Concatenate, Input
 from tensorflow.keras.layers import Conv2D, Conv2DTranspose, BatchNormalization, Add, LeakyReLU, MaxPooling2D, Dropout, concatenate, Concatenate, Activation
-from tensorflow.keras.applications import EfficientNetB4
+# from tensorflow.keras.applications import EfficientNetB4
 from tensorflow.keras.models import Model
-from tensorflow.keras.applications import EfficientNetB0
+# from tensorflow.keras.applications import EfficientNetB0
+from efficientnet import EfficientNetB4
+
 import tensorflow as tf
 
 from glob import glob 
