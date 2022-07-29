@@ -1,7 +1,11 @@
+# 참고
+# https://www.kaggle.com/code/meaninglesslives/unet-with-efficientnet-encoder-in-keras/notebook 
 from tensorflow.keras.layers import Conv2D, BatchNormalization, Activation, MaxPool2D, Conv2DTranspose, Concatenate, Input
 from tensorflow.keras.models import Model
 from tensorflow.keras.applications import EfficientNetB0
 import tensorflow as tf
+
+import models
 
 from glob import glob 
 import numpy as np
@@ -26,32 +30,32 @@ def decoder_block(inputs, skip, num_filters):
     x = conv_block(x, num_filters)
     return x
 
-def build_effienet_unet(input_shape):
-    """ Input """
-    inputs = Input(input_shape)
+# def build_effienet_unet(input_shape):
+#     """ Input """
+#     inputs = Input(input_shape)
 
-    """ Pre-trained Encoder """
-    encoder = EfficientNetB0(include_top=False, weights="imagenet", input_tensor=inputs)
+#     """ Pre-trained Encoder """
+#     encoder = EfficientNetB0(include_top=False, weights="imagenet", input_tensor=inputs)
 
-    s1 = encoder.get_layer("input_1").output                      ## 256
-    s2 = encoder.get_layer("block2a_expand_activation").output    ## 128
-    s3 = encoder.get_layer("block3a_expand_activation").output    ## 64
-    s4 = encoder.get_layer("block4a_expand_activation").output    ## 32
+#     s1 = encoder.get_layer("input_1").output                      ## 256
+#     s2 = encoder.get_layer("block2a_expand_activation").output    ## 128
+#     s3 = encoder.get_layer("block3a_expand_activation").output    ## 64
+#     s4 = encoder.get_layer("block4a_expand_activation").output    ## 32
 
-    """ Bottleneck """
-    b1 = encoder.get_layer("block6a_expand_activation").output    ## 16
+#     """ Bottleneck """
+#     b1 = encoder.get_layer("block6a_expand_activation").output    ## 16
 
-    """ Decoder """
-    d1 = decoder_block(b1, s4, 512)                               ## 32
-    d2 = decoder_block(d1, s3, 256)                               ## 64
-    d3 = decoder_block(d2, s2, 128)                               ## 128
-    d4 = decoder_block(d3, s1, 64)                                ## 256
+#     """ Decoder """
+#     d1 = decoder_block(b1, s4, 512)                               ## 32
+#     d2 = decoder_block(d1, s3, 256)                               ## 64
+#     d3 = decoder_block(d2, s2, 128)                               ## 128
+#     d4 = decoder_block(d3, s1, 64)                                ## 256
 
-    """ Output """
-    outputs = Conv2D(1, 1, padding="same", activation="sigmoid")(d4)
+#     """ Output """
+#     outputs = Conv2D(1, 1, padding="same", activation="sigmoid")(d4)
 
-    model = Model(inputs, outputs, name="EfficientNetB0_UNET")
-    return model
+#     model = Model(inputs, outputs, name="EfficientNetB0_UNET")
+#     return model
 
 def train_list(files, input_shape=256):
     
@@ -123,8 +127,10 @@ if __name__ == "__main__":
     
     train_images, train_labels = train_list(x_train_list, input_res)
     
-    model = build_effienet_unet(input_shape, )
-    model.summary()
+    # model = build_effienet_unet(input_shape, )
+    # model.summary()
+    
+    model = models.Unet()
     
     model.compile(loss='mse',
                   optimizer='adam'
