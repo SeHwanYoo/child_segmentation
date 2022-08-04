@@ -1,12 +1,6 @@
-<<<<<<< HEAD
-# 참고
-# https://www.kaggle.com/code/meaninglesslives/unet-with-efficientnet-encoder-in-keras/notebook 
-from tensorflow.keras.layers import Conv2D, BatchNormalization, Activation, MaxPool2D, Conv2DTranspose, Concatenate, Input
-=======
 # from tensorflow.keras.layers import Conv2D, BatchNormalization, Activation, MaxPool2D, Conv2DTranspose, Concatenate, Input
 from tensorflow.keras.layers import Conv2D, Conv2DTranspose, BatchNormalization, Add, LeakyReLU, MaxPooling2D, Dropout, concatenate, Concatenate, Activation
 # from tensorflow.keras.applications import EfficientNetB4
->>>>>>> 5e95da224ac20870673201c5c0baf280d39bdd69
 from tensorflow.keras.models import Model
 # from tensorflow.keras.applications import EfficientNetB0
 from efficientnet import EfficientNetB4
