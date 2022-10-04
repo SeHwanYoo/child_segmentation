@@ -1245,7 +1245,9 @@ ________________________________________________________________________________
  decoder_stage0b_relu (Activati  (None, 16, 16, 256)  0          ['decoder_stage0b_bn[0][0]']     
  on)                                                                                              
                                                                                                   
- decoder_stage1_upsampling (UpS  (None, 32, 32, 256)  0          ['decoder_stage0b_relu[0][0]']   
+ dropout (Dropout)              (None, 16, 16, 256)  0           ['decoder_stage0b_relu[0][0]']   
+                                                                                                  
+ decoder_stage1_upsampling (UpS  (None, 32, 32, 256)  0          ['dropout[0][0]']                
  ampling2D)                                                                                       
                                                                                                   
  decoder_stage1_concat (Concate  (None, 32, 32, 592)  0          ['decoder_stage1_upsampling[0][0]
@@ -1269,7 +1271,9 @@ ________________________________________________________________________________
  decoder_stage1b_relu (Activati  (None, 32, 32, 128)  0          ['decoder_stage1b_bn[0][0]']     
  on)                                                                                              
                                                                                                   
- decoder_stage2_upsampling (UpS  (None, 64, 64, 128)  0          ['decoder_stage1b_relu[0][0]']   
+ dropout_1 (Dropout)            (None, 32, 32, 128)  0           ['decoder_stage1b_relu[0][0]']   
+                                                                                                  
+ decoder_stage2_upsampling (UpS  (None, 64, 64, 128)  0          ['dropout_1[0][0]']              
  ampling2D)                                                                                       
                                                                                                   
  decoder_stage2_concat (Concate  (None, 64, 64, 320)  0          ['decoder_stage2_upsampling[0][0]
@@ -1293,7 +1297,9 @@ ________________________________________________________________________________
  decoder_stage2b_relu (Activati  (None, 64, 64, 64)  0           ['decoder_stage2b_bn[0][0]']     
  on)                                                                                              
                                                                                                   
- decoder_stage3_upsampling (UpS  (None, 128, 128, 64  0          ['decoder_stage2b_relu[0][0]']   
+ dropout_2 (Dropout)            (None, 64, 64, 64)   0           ['decoder_stage2b_relu[0][0]']   
+                                                                                                  
+ decoder_stage3_upsampling (UpS  (None, 128, 128, 64  0          ['dropout_2[0][0]']              
  ampling2D)                     )                                                                 
                                                                                                   
  decoder_stage3_concat (Concate  (None, 128, 128, 20  0          ['decoder_stage3_upsampling[0][0]
@@ -1319,7 +1325,10 @@ ________________________________________________________________________________
  decoder_stage3b_relu (Activati  (None, 128, 128, 32  0          ['decoder_stage3b_bn[0][0]']     
  on)                            )                                                                 
                                                                                                   
- decoder_stage4_upsampling (UpS  (None, 256, 256, 32  0          ['decoder_stage3b_relu[0][0]']   
+ dropout_3 (Dropout)            (None, 128, 128, 32  0           ['decoder_stage3b_relu[0][0]']   
+                                )                                                                 
+                                                                                                  
+ decoder_stage4_upsampling (UpS  (None, 256, 256, 32  0          ['dropout_3[0][0]']              
  ampling2D)                     )                                                                 
                                                                                                   
  decoder_stage4a_conv (Conv2D)  (None, 256, 256, 16  4608        ['decoder_stage4_upsampling[0][0]
@@ -1340,10 +1349,10 @@ ________________________________________________________________________________
  decoder_stage4b_relu (Activati  (None, 256, 256, 16  0          ['decoder_stage4b_bn[0][0]']     
  on)                            )                                                                 
                                                                                                   
- dropout (Dropout)              (None, 256, 256, 16  0           ['decoder_stage4b_relu[0][0]']   
+ dropout_4 (Dropout)            (None, 256, 256, 16  0           ['decoder_stage4b_relu[0][0]']   
                                 )                                                                 
                                                                                                   
- final_conv (Conv2D)            (None, 256, 256, 1)  145         ['dropout[0][0]']                
+ final_conv (Conv2D)            (None, 256, 256, 1)  145         ['dropout_4[0][0]']              
                                                                                                   
  sigmoid (Activation)           (None, 256, 256, 1)  0           ['final_conv[0][0]']             
                                                                                                   
