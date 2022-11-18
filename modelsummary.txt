@@ -1245,9 +1245,9 @@ ________________________________________________________________________________
  decoder_stage0b_relu (Activati  (None, 16, 16, 256)  0          ['decoder_stage0b_bn[0][0]']     
  on)                                                                                              
                                                                                                   
- dropout (Dropout)              (None, 16, 16, 256)  0           ['decoder_stage0b_relu[0][0]']   
+ dropout_1 (Dropout)            (None, 16, 16, 256)  0           ['decoder_stage0b_relu[0][0]']   
                                                                                                   
- decoder_stage1_upsampling (UpS  (None, 32, 32, 256)  0          ['dropout[0][0]']                
+ decoder_stage1_upsampling (UpS  (None, 32, 32, 256)  0          ['dropout_1[0][0]']              
  ampling2D)                                                                                       
                                                                                                   
  decoder_stage1_concat (Concate  (None, 32, 32, 592)  0          ['decoder_stage1_upsampling[0][0]
@@ -1271,9 +1271,9 @@ ________________________________________________________________________________
  decoder_stage1b_relu (Activati  (None, 32, 32, 128)  0          ['decoder_stage1b_bn[0][0]']     
  on)                                                                                              
                                                                                                   
- dropout_1 (Dropout)            (None, 32, 32, 128)  0           ['decoder_stage1b_relu[0][0]']   
+ dropout_2 (Dropout)            (None, 32, 32, 128)  0           ['decoder_stage1b_relu[0][0]']   
                                                                                                   
- decoder_stage2_upsampling (UpS  (None, 64, 64, 128)  0          ['dropout_1[0][0]']              
+ decoder_stage2_upsampling (UpS  (None, 64, 64, 128)  0          ['dropout_2[0][0]']              
  ampling2D)                                                                                       
                                                                                                   
  decoder_stage2_concat (Concate  (None, 64, 64, 320)  0          ['decoder_stage2_upsampling[0][0]
@@ -1297,9 +1297,9 @@ ________________________________________________________________________________
  decoder_stage2b_relu (Activati  (None, 64, 64, 64)  0           ['decoder_stage2b_bn[0][0]']     
  on)                                                                                              
                                                                                                   
- dropout_2 (Dropout)            (None, 64, 64, 64)   0           ['decoder_stage2b_relu[0][0]']   
+ dropout_3 (Dropout)            (None, 64, 64, 64)   0           ['decoder_stage2b_relu[0][0]']   
                                                                                                   
- decoder_stage3_upsampling (UpS  (None, 128, 128, 64  0          ['dropout_2[0][0]']              
+ decoder_stage3_upsampling (UpS  (None, 128, 128, 64  0          ['dropout_3[0][0]']              
  ampling2D)                     )                                                                 
                                                                                                   
  decoder_stage3_concat (Concate  (None, 128, 128, 20  0          ['decoder_stage3_upsampling[0][0]
@@ -1325,10 +1325,10 @@ ________________________________________________________________________________
  decoder_stage3b_relu (Activati  (None, 128, 128, 32  0          ['decoder_stage3b_bn[0][0]']     
  on)                            )                                                                 
                                                                                                   
- dropout_3 (Dropout)            (None, 128, 128, 32  0           ['decoder_stage3b_relu[0][0]']   
+ dropout_4 (Dropout)            (None, 128, 128, 32  0           ['decoder_stage3b_relu[0][0]']   
                                 )                                                                 
                                                                                                   
- decoder_stage4_upsampling (UpS  (None, 256, 256, 32  0          ['dropout_3[0][0]']              
+ decoder_stage4_upsampling (UpS  (None, 256, 256, 32  0          ['dropout_4[0][0]']              
  ampling2D)                     )                                                                 
                                                                                                   
  decoder_stage4a_conv (Conv2D)  (None, 256, 256, 16  4608        ['decoder_stage4_upsampling[0][0]
@@ -1349,17 +1349,23 @@ ________________________________________________________________________________
  decoder_stage4b_relu (Activati  (None, 256, 256, 16  0          ['decoder_stage4b_bn[0][0]']     
  on)                            )                                                                 
                                                                                                   
- dropout_4 (Dropout)            (None, 256, 256, 16  0           ['decoder_stage4b_relu[0][0]']   
+ dropout_5 (Dropout)            (None, 256, 256, 16  0           ['decoder_stage4b_relu[0][0]']   
                                 )                                                                 
                                                                                                   
- final_conv (Conv2D)            (None, 256, 256, 1)  145         ['dropout_4[0][0]']              
+ global_average_pooling2d (Glob  (None, 1792)        0           ['top_activation[0][0]']         
+ alAveragePooling2D)                                                                              
+                                                                                                  
+ final_conv (Conv2D)            (None, 256, 256, 1)  145         ['dropout_5[0][0]']              
+                                                                                                  
+ dropout (Dropout)              (None, 1792)         0           ['global_average_pooling2d[0][0]'
+                                                                 ]                                
                                                                                                   
  sigmoid (Activation)           (None, 256, 256, 1)  0           ['final_conv[0][0]']             
                                                                                                   
- cls_classification (Dense)     (None, 256, 256, 4)  68          ['dropout_4[0][0]']              
+ cls_classification (Dense)     (None, 4)            7172        ['dropout[0][0]']                
                                                                                                   
 ==================================================================================================
-Total params: 25,735,085
-Trainable params: 25,607,901
+Total params: 25,742,189
+Trainable params: 25,615,005
 Non-trainable params: 127,184
 __________________________________________________________________________________________________
