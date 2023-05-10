@@ -95,10 +95,6 @@ class BayesianLoss(nn.Module):
         print(weights.shape)
         print(logits.shape)
         print(masks.shape)
-        print('-' * 20)
-        print(weights)
-        print(logits)
-        print(masks)
         
         loss = -torch.mean(torch.sum(weights * masks * torch.log_softmax(logits, dim=1), dim=1), dim=(1, 2))
         
