@@ -10,7 +10,7 @@ class SegDataset(Dataset):
         super().__init__()
         
         self.transform = transform
-        
+        self.res = 256
         self.img_list = []
         self.mask_list = []
 
@@ -30,8 +30,8 @@ class SegDataset(Dataset):
         return len(self.img_list)
 
     def __getitem__(self, index):      
-        img = Image.open(self.img_list[index])
-        mask = Image.open(self.mask_list[index])
+        img = Image.open(self.img_list[index]).resize((self.res, self.res))
+        mask = Image.open(self.mask_list[index]).resize((self.res, self.res))
         
         img = np.array(img)
         mask = np.array(mask)
