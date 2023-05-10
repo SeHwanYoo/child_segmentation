@@ -37,7 +37,7 @@ def parse_args():
     
     return args
 
-def train(t_model, t_train_loader, t_optimizer):    
+def train(t_model, t_train_loader, t_optimizer, t_loss_function):    
     t_model.train()
     # t_loss = 0
     # t_count = 0
@@ -56,8 +56,8 @@ def train(t_model, t_train_loader, t_optimizer):
         preds = torch.argmax(logits, dim=1)
         
         # Compute loss, weighting by uncertainty
-        # loss = loss_function(logits, masks)
-        loss = models.bayesian_loss(logits, masks)
+        loss = t_loss_function(logits, masks)
+        # loss = models.bayesian_loss(logits, masks)
         weighted_loss = (loss * uncertainty).mean()
         
         # Backpropagate and update parameters
@@ -130,7 +130,7 @@ def main():
     Test_Dataset = datasets.SegDataset(path, ints=ints[args.ints], grds=grds[args.grds],is_test=True)
     test_dataset = DataLoader(Test_Dataset, batch_size=args.batch_size, shuffle=False, num_workers=4, )
   
-    # loss_function = models.bayesian_loss()
+    loss_function = models.Bayesian_loss()
     
     model = models.SegmentationModel().to(device)
     learning_rate = 0.0001
@@ -142,7 +142,7 @@ def main():
     # train
     for _ in range(1, args.epochs+1):
         # r_pred, r_label = train(model, train_dataset, optimizer, loss_function, scheduler)
-       train(model, train_dataset, optimizer)
+       train(model, train_dataset, optimizer, loss_function)
     
     
     # eval 

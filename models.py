@@ -69,51 +69,32 @@ class SegmentationModel(nn.Module):
         return mean, log_var
     
     
-def bayesian_loss(mean=None, log_var=None, target=None):
-    # Compute the negative log likelihood
-    log_likelihood = -0.5 * torch.sum(((target - mean) ** 2) / torch.exp(log_var), dim=(1, 2, 3)) \
-                     - 0.5 * torch.sum(log_var, dim=(1, 2, 3)) \
-                     - 0.5 * (target.shape[1] * target.shape[2] * target.shape[3]) \
-                     * (torch.log(torch.tensor(2.0 * 3.141592653589793, device=target.device))
-                        + torch.log(torch.exp(log_var)))
-
-    neg_log_likelihood = torch.mean(log_likelihood)
-
-    # Compute the epistemic uncertainty
-    epistemic_uncertainty = -0.5 * torch.sum(log_var, dim=(1, 2, 3))
-
-    # Compute the aleatoric uncertainty
-    aleatoric_uncertainty = 0.5 * torch.sum(torch.exp(log_var), dim=(1, 2, 3))
-
-    # Compute the total uncertainty
-    total_uncertainty = epistemic_uncertainty + aleatoric_uncertainty
-
-    # Compute the loss as a weighted sum of the negative log likelihood and the total uncertainty
-    beta = 1.0  # hyperparameter that controls the weighting between the two terms
-    loss = neg_log_likelihood + beta * torch.mean(total_uncertainty)
-
-    return loss
-
-
-# Define the loss function
-# def bayesian_loss(mean, log_var, target):
-#     aleatoric_uncertainty = torch.exp(log_var)
-#     # Compute the epistemic uncertainty using Monte Carlo dropout
-#     num_samples = 10
-#     outputs = []
-#     for i in range(num_samples):
-#         output = mean + aleatoric_uncertainty * torch.randn_like(mean)
-#         outputs.append(output)
-#     outputs = torch.stack(outputs)
-#     mean_output = torch.mean(outputs, dim=0)
-#     epistemic_uncertainty = torch.var(outputs, dim=0)
-#     # Compute the negative log likelihood
-#     log_likelihood = -0.5 * torch.sum((target - mean_output)**2 / aleatoric_uncertainty + torch.log(aleatoric_uncertainty) + 2 * torch.log(torch.tensor(2.0 * 3.141592653589793, device=target.device)))  
-#     # constant term
-#     neg_log_likelihood = torch.mean(log_likelihood)
-#     # Compute the total uncertainty
-#     total_uncertainty = epistemic_uncertainty + aleatoric_uncertainty
-#     # Compute the loss as a weighted sum of the negative log likelihood and the total uncertainty
-#     beta = 1.0  # hyperparameter that controls the weighting between the two terms
-#     loss = neg_log_likelihood + beta * torch.mean(total_uncertainty)
-#     return loss
+class loss_function(nn.Module):
+    def __init__(self, reduction='mean'):
+        super().__init__()
+        self.reduction = reduction
+        
+    def forward(self, logits, masks):
+        # Compute aleatoric uncertainty
+        aleatoric_uncertainty = torch.mean(torch.softmax(logits, dim=1) * (1 - torch.softmax(logits, dim=1)), dim=1, keepdim=True)
+        
+        # Compute epistemic uncertainty
+        num_samples = 10
+        logit_samples = [logits for _ in range(num_samples)]
+        sample_probs = torch.stack([torch.softmax(logit, dim=1) for logit in logit_samples], dim=0)
+        mean_probs = torch.mean(sample_probs, dim=0)
+        epistemic_uncertainty = torch.mean((sample_probs - mean_probs)**2, dim=0, keepdim=True)
+        
+        # Compute total uncertainty
+        total_uncertainty = aleatoric_uncertainty + epistemic_uncertainty
+        
+        # Compute weighted cross-entropy loss
+        weights = total_uncertainty / torch.sum(total_uncertainty, dim=(1, 2), keepdim=True)
+        loss = -torch.mean(torch.sum(weights * masks * torch.log_softmax(logits, dim=1), dim=1), dim=(1, 2))
+        
+        if self.reduction == 'mean':
+            return loss.mean()
+        elif self.reduction == 'sum':
+            return loss.sum()
+        else:
+            return loss
