@@ -70,35 +70,42 @@ class SegmentationModel(nn.Module):
     
     
 class BayesianLoss(nn.Module):
-    def __init__(self, num_samples=10, ignore_index=255):
-        super().__init__()
+    def __init__(self, num_classes, num_samples=10, ignore_index=255):
+        super(BayesianSegmentationLoss, self).__init__()
+        self.num_classes = num_classes
         self.num_samples = num_samples
         self.ignore_index = ignore_index
 
     def forward(self, logits, masks):
-        batch_size, num_classes, height, width = logits.shape
-        weights = (masks != self.ignore_index).float()
+        """
+        :param logits: Tensor of shape [batch_size, num_classes, height, width] representing model output
+        :param masks: Tensor of shape [batch_size, height, width] representing ground truth masks
+        :return: Scalar tensor representing loss
+        """
+        # Resize masks to match logits
+        masks_resized = F.interpolate(masks.unsqueeze(1).float(), size=logits.shape[2:], mode="nearest").long().squeeze(1)
+        masks_resized[masks_resized == self.ignore_index] = 0
 
-        # Compute aleatoric uncertainty
-        aleatoric_loss = 0
+        # Calculate aleatoric and epistemic uncertainties
+        aleatoric_loss, epistemic_loss = 0.0, 0.0
         for i in range(self.num_samples):
             probs_sample = F.softmax(logits, dim=1)
-            aleatoric_loss += torch.mean(torch.sum(-weights * torch.log(probs_sample + 1e-10), dim=1), dim=(1, 2))
-        aleatoric_loss /= self.num_samples
+            aleatoric_loss += torch.mean(torch.sum(-probs_sample * torch.log(probs_sample + 1e-10), dim=1),
+                                          dim=(1, 2))
+            epistemic_loss += torch.sum(probs_sample ** 2, dim=0) / self.num_samples
+        epistemic_loss = torch.mean(torch.sum((epistemic_loss - torch.mean(epistemic_loss, dim=0)) ** 2, dim=0),
+                                    dim=(1, 2))
 
-        # Compute epistemic uncertainty
-        logits_resized = logits.view(batch_size, 1, num_classes, height, width).repeat(1, self.num_samples, 1, 1, 1)
-        masks_resized = masks.view(batch_size, 1, height, width).repeat(1, self.num_samples, 1, 1)
+        # Calculate total uncertainty loss
+        total_uncertainty_loss = aleatoric_loss + epistemic_loss
 
-        epistemic_loss = 0
-        for i in range(self.num_samples):
-            probs_sample = F.softmax(logits_resized[:, i], dim=1)
-            kl_div = F.kl_div(torch.log(probs_sample + 1e-10), torch.log_softmax(logits_resized, dim=2), reduction='none')
-            kl_div = kl_div.sum(dim=2).mean(dim=(1, 2))
-            epistemic_loss += kl_div
-        epistemic_loss /= self.num_samples
+        # Calculate cross entropy loss
+        weights = torch.ones(self.num_classes)
+        weights[0] = 0
+        weights = weights.to(logits.device)
+        loss = nn.CrossEntropyLoss(weight=weights, ignore_index=self.ignore_index)(logits, masks_resized)
 
-        # Combine losses
-        loss = aleatoric_loss + epistemic_loss
+        # Combine total uncertainty loss and cross entropy loss
+        loss += total_uncertainty_loss
 
         return loss
