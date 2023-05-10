@@ -70,8 +70,8 @@ class SegmentationModel(nn.Module):
     
     
 class BayesianLoss(nn.Module):
-    def __init__(self, num_classes, num_samples=10, ignore_index=255):
-        super(BayesianSegmentationLoss, self).__init__()
+    def __init__(self, num_classes=2, num_samples=10, ignore_index=255):
+        super(BayesianLoss, self).__init__()
         self.num_classes = num_classes
         self.num_samples = num_samples
         self.ignore_index = ignore_index
