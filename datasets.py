@@ -41,9 +41,9 @@ class SegDataset(Dataset):
         # if self.transform is not None:
         #     img, mask = self.transform(image=img, mask=mask)
             
-        # print('-' * 20)
-        # print(img)
-        # print(mask)
+        print('-' * 20)
+        print(img.shape)
+        print(mask.shape)
 
         img = torch.tensor(img).permute(2, 0, 1).float()
         mask = torch.tensor(mask).permute(2, 0, 1).float()
