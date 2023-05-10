@@ -55,8 +55,23 @@ class Decoder(nn.Module):
         return mean, log_var
 
 class SegmentationModel(nn.Module):
+    """
+    Segmentation model that combines the encoder and decoder.
+    """
+    def __init__(self, num_classes=2):
+        super().__init__()
+        self.encoder = Encoder()
+        self.decoder = Decoder(2048, num_classes)
+
+    def forward(self, x):
+        features = self.encoder(x)
+        mean, log_var = self.decoder(features)
+        return mean, log_var
+    
+    
+class BayesianLoss(nn.Module):
     def __init__(self, num_samples=10):
-        super(SegmentationModel, self).__init__()
+        super(BayesianLoss, self).__init__()
         self.num_samples = num_samples
 
     def forward(self, logits, masks):
