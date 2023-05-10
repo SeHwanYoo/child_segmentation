@@ -70,42 +70,35 @@ class SegmentationModel(nn.Module):
     
     
 class BayesianLoss(nn.Module):
-    def __init__(self, num_samples=10):
-        super(BayesianLoss, self).__init__()
+    def __init__(self, num_samples):
+        super().__init__()
         self.num_samples = num_samples
 
     def forward(self, logits, masks):
-        """
-        Calculates the total uncertainty loss as the sum of epistemic and aleatoric uncertainty losses.
-
-        Args:
-            logits: The logits output by the segmentation model.
-            masks: The ground truth segmentation masks.
-
-        Returns:
-            The total uncertainty loss.
-        """
-        batch_size, num_classes, height, width = logits.shape
-
-        # Resample logits for Monte Carlo sampling
-        logits_reshaped = logits.reshape(batch_size, num_classes, -1)
-        weights = torch.softmax(logits_reshaped, dim=1)
-        weights = weights.reshape(batch_size, num_classes, height, width)
-
-        logits_resized = F.interpolate(logits, size=masks.shape[2:], mode='bilinear', align_corners=False)
-
-        # Calculate epistemic uncertainty loss
-        epistemic_loss = torch.mean(torch.var(weights, dim=0), dim=(1, 2))
+        aleatoric_loss = 0
+        epistemic_loss = 0
 
         # Calculate aleatoric uncertainty loss
-        aleatoric_loss = 0
         for i in range(self.num_samples):
-            logits_sample = logits_resized + torch.randn_like(logits_resized)
-            probs_sample = torch.softmax(logits_sample, dim=1)
+            probs_sample = F.softmax(logits, dim=1)
+            weights = 1.0 - probs_sample
+
+            # expand weights tensor to match the number of output channels in probs_sample
+            weights = weights.expand(-1, probs_sample.size(1), -1, -1, -1)
+
             aleatoric_loss += torch.mean(torch.sum(-weights * torch.log(probs_sample + 1e-10), dim=1), dim=(1, 2))
+
         aleatoric_loss /= self.num_samples
 
-        # Calculate total uncertainty loss
-        loss = epistemic_loss + aleatoric_loss
+        # Calculate epistemic uncertainty loss
+        probs = F.softmax(logits, dim=1)
+        epistemic_loss += torch.sum(torch.square(probs - torch.mean(probs, dim=0)), dim=1)
+        epistemic_loss /= (2 * self.num_samples)
+
+        # Total loss is the sum of aleatoric and epistemic losses
+        loss = aleatoric_loss + epistemic_loss
+
+        # Apply the segmentation mask
+        loss = -torch.mean(torch.sum(masks * loss, dim=1))
 
         return loss
