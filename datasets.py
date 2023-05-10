@@ -35,6 +35,11 @@ class SegDataset(Dataset):
         
         img = np.array(img)
         mask = np.array(mask)
+        
+        print('-' * 50)
+        print(img.shape)
+        print(mask.shape)
+        
         # mask[mask==255.0] = 1.0
         mask[mask > 0] = 1.0 
         
