@@ -30,8 +30,8 @@ class SegDataset(Dataset):
         return len(self.img_list)
 
     def __getitem__(self, index):      
-        img = Image.open(self.img_list[index]).convert('RGB')
-        mask = Image.open(self.mask_list[index]).convert('L')
+        img = Image.open(self.img_list[index])
+        mask = Image.open(self.mask_list[index])
         
         img = np.array(img)
         mask = np.array(mask)
