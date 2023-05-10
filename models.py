@@ -105,7 +105,8 @@ class BayesianLoss(nn.Module):
                                           dim=(1, 2))
             epistemic_loss += torch.sum(probs_sample ** 2, dim=0) / self.num_samples
         epistemic_loss = torch.mean(torch.sum((epistemic_loss - torch.mean(epistemic_loss, dim=0)) ** 2, dim=0),
-                                    dim=(1, 2))
+                                    # dim=(1, 2))
+                                    dim=(-2, 1))
 
         # Calculate total uncertainty loss
         total_uncertainty_loss = aleatoric_loss + epistemic_loss
