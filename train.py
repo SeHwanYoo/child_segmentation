@@ -41,8 +41,8 @@ def train(t_model, t_train_loader, t_optimizer):
     t_model.train()
     # t_loss = 0
     # t_count = 0
-    pred_array = np.array([])
-    label_array = np.array([])
+    # pred_array = np.array([])
+    # label_array = np.array([])
     
     epoch = 0 
     total_epochs = len(t_train_loader) 
@@ -137,10 +137,10 @@ def main():
     
     
     optimizer = optim.Adam(model.parameters(), lr=learning_rate)
-    scheduler = optim.lr_scheduler.LambdaLR(optimizer=optimizer, lr_lambda=lambda epoch: 0.95 ** epoch, last_epoch=-1, verbose=False)
+    # scheduler = optim.lr_scheduler.LambdaLR(optimizer=optimizer, lr_lambda=lambda epoch: 0.95 ** epoch, last_epoch=-1, verbose=False)
 
     # train
-    for epoch in range(1, args.epochs+1):
+    for _ in range(1, args.epochs+1):
         # r_pred, r_label = train(model, train_dataset, optimizer, loss_function, scheduler)
        train(model, train_dataset, optimizer)
     

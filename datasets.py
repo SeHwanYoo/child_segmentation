@@ -32,8 +32,9 @@ class SegDataset(Dataset):
         img = Image.open(self.img_list[index]).convert('RGB')
         mask = Image.open(self.mask_list[index]).convert('L')
         
-        if self.transform is not None:
-            img, mask = self.transform(image=img, mask=mask)
+        # if self.transform is not None:
+        #     sample = {'image' : img, 'mask'}
+        #     img, mask = self.transform(image=img, mask=mask)
             
         print('-' * 20)
         print(img)
