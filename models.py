@@ -69,7 +69,7 @@ class SegmentationModel(nn.Module):
         return mean, log_var
     
     
-def bayesian_loss(mean, log_var, target):
+def bayesian_loss(mean=None, log_var=None, target=None):
     # Compute the negative log likelihood
     log_likelihood = -0.5 * torch.sum(((target - mean) ** 2) / torch.exp(log_var), dim=(1, 2, 3)) \
                      - 0.5 * torch.sum(log_var, dim=(1, 2, 3)) \
