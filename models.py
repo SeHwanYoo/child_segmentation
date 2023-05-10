@@ -64,11 +64,16 @@ class SegmentationModel(nn.Module):
         self.decoder = Decoder(2048, num_classes)
 
     def forward(self, x):
+        # Resize input to 256x256
+        x = F.interpolate(x, size=(256, 256), mode="bilinear", align_corners=True)
         features = self.encoder(x)
         mean, log_var = self.decoder(features)
+        # Resize mean and log_var to match input size
+        mean = F.interpolate(mean, size=x.shape[2:], mode="bilinear", align_corners=True)
+        log_var = F.interpolate(log_var, size=x.shape[2:], mode="bilinear", align_corners=True)
         return mean, log_var
-    
-    
+
+
 class BayesianLoss(nn.Module):
     def __init__(self, num_classes=2, num_samples=10, ignore_index=255):
         super(BayesianLoss, self).__init__()
