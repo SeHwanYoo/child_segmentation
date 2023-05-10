@@ -31,8 +31,8 @@ def parse_args():
     parser.add_argument('--epochs', required=False, type=int, default=100)
     parser.add_argument('--eval_epocs', required=False, type=int, default=10)
     
-    parser.add_argument('--ints', required=False, default='2')
-    parser.add_argument('--grds', required=False, default='3')
+    parser.add_argument('--ints', required=False, type=int, default=2)
+    parser.add_argument('--grds', required=False, type=int, default=3)
     args = parser.parse_args()
     
     return args
@@ -125,7 +125,7 @@ def main():
         transforms.ToTensor(),
     ])
     
-    Train_Dataset = datasets.SegDataset(path, args.ints, args.grds, transform=transform, is_test=False)
+    Train_Dataset = datasets.SegDataset(path, ints[args.ints], grds[args.grds], transform=transform, is_test=False)
     train_dataset = DataLoader(Train_Dataset, batch_size=args.batch_size, shuffle=True, num_workers=4, )
     
     Test_Dataset = datasets.SegDataset(path, is_test=True)

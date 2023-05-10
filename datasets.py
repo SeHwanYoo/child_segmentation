@@ -5,7 +5,7 @@ from glob import glob
 from PIL import Image
 
 class SegDataset(Dataset):
-    def __init__(self, path, ints='2', grds='3', transform=None, is_test=False):
+    def __init__(self, path, ints, grds, transform=None, is_test=False):
         super().__init__()
         
         self.transform = transform
