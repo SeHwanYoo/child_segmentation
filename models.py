@@ -90,6 +90,16 @@ class BayesianLoss(nn.Module):
         
         # Compute weighted cross-entropy loss
         weights = total_uncertainty / torch.sum(total_uncertainty, dim=(1, 2), keepdim=True)
+        
+        print('=' * 20)
+        print(weights.shape)
+        print(logits.shape)
+        print(masks.shape)
+        print('-' * 20)
+        print(weights)
+        print(logits)
+        print(masks)
+        
         loss = -torch.mean(torch.sum(weights * masks * torch.log_softmax(logits, dim=1), dim=1), dim=(1, 2))
         
         if self.reduction == 'mean':
