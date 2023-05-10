@@ -37,9 +37,8 @@ class SegDataset(Dataset):
         mask = np.array(mask)
         mask[mask==255.0] = 1.0
         
-        if self.transform is not None:
-            # sample = {'image' : img, 'mask'}
-            img, mask = self.transform(image=img, mask=mask)
+        # if self.transform is not None:
+        #     img, mask = self.transform(image=img, mask=mask)
             
         print('-' * 20)
         print(img)
