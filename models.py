@@ -69,7 +69,7 @@ class SegmentationModel(nn.Module):
         return mean, log_var
     
     
-class loss_function(nn.Module):
+class BayesianLoss(nn.Module):
     def __init__(self, reduction='mean'):
         super().__init__()
         self.reduction = reduction

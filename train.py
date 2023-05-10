@@ -130,7 +130,7 @@ def main():
     Test_Dataset = datasets.SegDataset(path, ints=ints[args.ints], grds=grds[args.grds],is_test=True)
     test_dataset = DataLoader(Test_Dataset, batch_size=args.batch_size, shuffle=False, num_workers=4, )
   
-    loss_function = models.Bayesian_loss()
+    loss_function = models.BayesianLoss()
     
     model = models.SegmentationModel().to(device)
     learning_rate = 0.0001
