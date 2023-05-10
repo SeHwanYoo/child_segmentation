@@ -12,9 +12,7 @@ class SegDataset(Dataset):
         
         self.img_list = []
         self.mask_list = []
-        
-        print(os.path.join(path, ints, 'Atopy_Segment_Train', f'{grds}/*.jpg'))
-        
+
         if is_test:
             self.img_list = glob(os.path.join(path, ints, 'Atopy_Segment_Test', f'{grds}/*.jpg'))
             self.mask_list = glob(os.path.join(path, ints, 'Atopy_Segment_Test', f'{grds}/*.png'))
