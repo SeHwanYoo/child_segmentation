@@ -5,7 +5,7 @@ from glob import glob
 from PIL import Image
 
 class SegDataset(Dataset):
-    def __init__(self, path, inters=0, grade=3, transform=None, is_test=False):
+    def __init__(self, path, ints='2', grds='3', transform=None, is_test=False):
         super().__init__()
         
         self.transform = transform
@@ -14,12 +14,12 @@ class SegDataset(Dataset):
         self.mask_list = []
         
         if is_test:
-            self.img_list = glob(os.path.join(path, inters, 'Atopy_Segment_Test', f'{grade}/*.jpg'))
-            self.mask_list = glob(os.path.join(path, inters, 'Atopy_Segment_Test', f'{grade}/*.png'))
+            self.img_list = glob(os.path.join(path, ints, 'Atopy_Segment_Test', f'{grds}/*.jpg'))
+            self.mask_list = glob(os.path.join(path, ints, 'Atopy_Segment_Test', f'{grds}/*.png'))
             
         else:
-            self.img_list = glob(os.path.join(path, inters, 'Atopy_Segment_Train', f'{grade}/*.jpg'))
-            self.mask_list = glob(os.path.join(path, inters, 'Atopy_Segment_Train', f'{grade}/*.png'))
+            self.img_list = glob(os.path.join(path, ints, 'Atopy_Segment_Train', f'{grds}/*.jpg'))
+            self.mask_list = glob(os.path.join(path, ints, 'Atopy_Segment_Train', f'{grds}/*.png'))
             
             # x_extra_list = glob(os.path.join(path, inters, 'Atopy_Segment_Extra', f'{grade}/*.jpg'))
             # y_extra_list = glob(os.path.join(path, inters, 'Atopy_Segment_Extra', f'{grade}/*.png'))

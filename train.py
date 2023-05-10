@@ -22,8 +22,8 @@ device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 
 path = '../../datasets/Atopy Segmentation'
 
-paths = ['Intersect_0.75', 'Intersect_0.8', 'Intersect_0.85']
-grades = ['Grade0', 'Grade1', 'Grade2', 'Grade3']
+ints = ['Intersect_0.75', 'Intersect_0.8', 'Intersect_0.85']
+grds = ['Grade0', 'Grade1', 'Grade2', 'Grade3']
 
 def parse_args():
     parser = argparse.ArgumentParser()
@@ -31,8 +31,8 @@ def parse_args():
     parser.add_argument('--epochs', required=False, type=int, default=100)
     parser.add_argument('--eval_epocs', required=False, type=int, default=10)
     
-    parser.add_argument('--p_grades', required=False, type=int, default=2)
-    parser.add_argument('--p_paths', required=False, type=int, default=3)
+    parser.add_argument('--ints', required=False, default='2')
+    parser.add_argument('--grds', required=False, default='3')
     args = parser.parse_args()
     
     return args
@@ -125,7 +125,7 @@ def main():
         transforms.ToTensor(),
     ])
     
-    Train_Dataset = datasets.SegDataset(path, transform=transform, is_test=False)
+    Train_Dataset = datasets.SegDataset(path, args.ints, args.grds, transform=transform, is_test=False)
     train_dataset = DataLoader(Train_Dataset, batch_size=args.batch_size, shuffle=True, num_workers=4, )
     
     Test_Dataset = datasets.SegDataset(path, is_test=True)
