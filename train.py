@@ -125,10 +125,10 @@ def main():
         transforms.ToTensor(),
     ])
     
-    Train_Dataset = datasets.SegDataset(path, ints[args.ints], grds[args.grds], transform=transform, is_test=False)
+    Train_Dataset = datasets.SegDataset(path, ints=ints[args.ints], grds=grds[args.grds], transform=transform, is_test=False)
     train_dataset = DataLoader(Train_Dataset, batch_size=args.batch_size, shuffle=True, num_workers=4, )
     
-    Test_Dataset = datasets.SegDataset(path, is_test=True)
+    Test_Dataset = datasets.SegDataset(path, ints=ints[args.ints], grds=grds[args.grds],is_test=True)
     test_dataset = DataLoader(Test_Dataset, batch_size=args.batch_size, shuffle=False, num_workers=4, )
   
     loss_function = models.bayesian_loss()
