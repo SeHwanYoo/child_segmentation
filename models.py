@@ -83,8 +83,10 @@ class BayesianLoss(nn.Module):
         :return: Scalar tensor representing loss
         """
         # Resize masks to match logits
-        masks_resized = F.interpolate(masks.unsqueeze(1).float(), size=logits.shape[2:], mode="nearest").long().squeeze(1)
-        masks_resized[masks_resized == self.ignore_index] = 0
+        # masks_resized = F.interpolate(masks.unsqueeze(1).float(), size=logits.shape[2:], mode="nearest").long().squeeze(1)
+
+        # masks_resized = F.interpolate(masks.unsqueeze(1).float(), size=logits.shape[2:], mode="nearest").long().squeeze(1)
+        # masks_resized[masks_resized == self.ignore_index] = 0
 
         # Calculate aleatoric and epistemic uncertainties
         aleatoric_loss, epistemic_loss = 0.0, 0.0
@@ -103,7 +105,8 @@ class BayesianLoss(nn.Module):
         weights = torch.ones(self.num_classes)
         weights[0] = 0
         weights = weights.to(logits.device)
-        loss = nn.CrossEntropyLoss(weight=weights, ignore_index=self.ignore_index)(logits, masks_resized)
+        # loss = nn.CrossEntropyLoss(weight=weights, ignore_index=self.ignore_index)(logits, masks_resized)
+        loss = nn.CrossEntropyLoss(weight=weights, ignore_index=self.ignore_index)(logits, masks)
 
         # Combine total uncertainty loss and cross entropy loss
         loss += total_uncertainty_loss
