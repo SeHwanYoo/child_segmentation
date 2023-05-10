@@ -70,35 +70,35 @@ class SegmentationModel(nn.Module):
     
     
 class BayesianLoss(nn.Module):
-    def __init__(self, num_samples=10):
+    def __init__(self, num_samples, ignore_index=255):
         super().__init__()
         self.num_samples = num_samples
+        self.ignore_index = ignore_index
 
     def forward(self, logits, masks):
-        aleatoric_loss = 0
-        epistemic_loss = 0
+        batch_size, num_classes, height, width = logits.shape
+        weights = (masks != self.ignore_index).float()
 
-        # Calculate aleatoric uncertainty loss
+        # Compute aleatoric uncertainty
+        aleatoric_loss = 0
         for i in range(self.num_samples):
             probs_sample = F.softmax(logits, dim=1)
-            weights = 1.0 - probs_sample
-
-            # expand weights tensor to match the number of output channels in probs_sample
-            weights = weights.expand(-1, probs_sample.size(1), -1, -1, -1)
-
             aleatoric_loss += torch.mean(torch.sum(-weights * torch.log(probs_sample + 1e-10), dim=1), dim=(1, 2))
-
         aleatoric_loss /= self.num_samples
 
-        # Calculate epistemic uncertainty loss
-        probs = F.softmax(logits, dim=1)
-        epistemic_loss += torch.sum(torch.square(probs - torch.mean(probs, dim=0)), dim=1)
-        epistemic_loss /= (2 * self.num_samples)
+        # Compute epistemic uncertainty
+        logits_resized = logits.view(batch_size, 1, num_classes, height, width).repeat(1, self.num_samples, 1, 1, 1)
+        masks_resized = masks.view(batch_size, 1, height, width).repeat(1, self.num_samples, 1, 1)
 
-        # Total loss is the sum of aleatoric and epistemic losses
+        epistemic_loss = 0
+        for i in range(self.num_samples):
+            probs_sample = F.softmax(logits_resized[:, i], dim=1)
+            kl_div = F.kl_div(torch.log(probs_sample + 1e-10), torch.log_softmax(logits_resized, dim=2), reduction='none')
+            kl_div = kl_div.sum(dim=2).mean(dim=(1, 2))
+            epistemic_loss += kl_div
+        epistemic_loss /= self.num_samples
+
+        # Combine losses
         loss = aleatoric_loss + epistemic_loss
-
-        # Apply the segmentation mask
-        loss = -torch.mean(torch.sum(masks * loss, dim=1))
 
         return loss
