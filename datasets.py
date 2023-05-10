@@ -3,6 +3,7 @@ from torch.utils.data import Dataset
 import os 
 from glob import glob
 from PIL import Image
+import numpy as np
 
 class SegDataset(Dataset):
     def __init__(self, path, ints, grds, transform=None, is_test=False):
@@ -32,9 +33,13 @@ class SegDataset(Dataset):
         img = Image.open(self.img_list[index]).convert('RGB')
         mask = Image.open(self.mask_list[index]).convert('L')
         
-        # if self.transform is not None:
-        #     sample = {'image' : img, 'mask'}
-        #     img, mask = self.transform(image=img, mask=mask)
+        img = np.array(img)
+        mask = np.array(mask)
+        mask[mask==255.0] = 1.0
+        
+        if self.transform is not None:
+            # sample = {'image' : img, 'mask'}
+            img, mask = self.transform(image=img, mask=mask)
             
         print('-' * 20)
         print(img)
