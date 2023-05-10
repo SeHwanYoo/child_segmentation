@@ -51,8 +51,8 @@ class SegDataset(Dataset):
         print(mask.shape)
 
         img = torch.tensor(img).permute(2, 0, 1).float()
-        mask = torch.tensor(mask).permute(2, 0, 1).float()
-        # mask = torch.tensor(mask).unsqueeze(0).float()
+        # mask = torch.tensor(mask).permute(2, 0, 1).float()
+        mask = torch.tensor(mask).unsqueeze(0).float()
         
         return img, mask
        
