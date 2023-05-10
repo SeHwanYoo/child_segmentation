@@ -46,7 +46,7 @@ def train(t_model, t_train_loader, t_optimizer):
     
     epoch = 0 
     total_epochs = len(t_train_loader) 
-    for batch_ppg, batch_target in tqdm(t_train_loader):
+    for images, masks in tqdm(t_train_loader):
         
         images = images.to(device)
         masks = masks.to(device)
