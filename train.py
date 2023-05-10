@@ -22,17 +22,22 @@ device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 
 path = '../../datasets/Atopy Segmentation'
 
+paths = ['Intersect_0.75', 'Intersect_0.8', 'Intersect_0.85']
+grades = ['Grade0', 'Grade1', 'Grade2', 'Grade3']
 
 def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('--batch_size', required=False, type=int, default=256)
     parser.add_argument('--epochs', required=False, type=int, default=100)
     parser.add_argument('--eval_epocs', required=False, type=int, default=10)
+    
+    parser.add_argument('--p_grades', required=False, type=int, default=2)
+    parser.add_argument('--p_paths', required=False, type=int, default=3)
     args = parser.parse_args()
     
     return args
 
-def train(t_model, t_train_loader, t_valid_loader, t_optimizer, loss_function):    
+def train(t_model, t_train_loader, t_optimizer, loss_function):    
     t_model.train()
     # t_loss = 0
     # t_count = 0
