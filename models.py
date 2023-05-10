@@ -92,6 +92,10 @@ class BayesianLoss(nn.Module):
         aleatoric_loss, epistemic_loss = 0.0, 0.0
         for i in range(self.num_samples):
             probs_sample = F.softmax(logits, dim=1)
+            print('-' * 20)
+            print(logits.shape)
+            print(probs_sample.shape)
+            
             aleatoric_loss += torch.mean(torch.sum(-probs_sample * torch.log(probs_sample + 1e-10), dim=1),
                                           dim=(1, 2))
             epistemic_loss += torch.sum(probs_sample ** 2, dim=0) / self.num_samples
