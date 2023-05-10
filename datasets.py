@@ -44,7 +44,7 @@ class SegDataset(Dataset):
 
         img = torch.tensor(img).permute(2, 0, 1).float()
         # mask = torch.tensor(mask).permute(2, 0, 1).float()
-        mask = torch.tensor(mask).unsqueeze(0).float()
+        mask = torch.tensor(mask).unsqueeze(0).permute(2, 0, 1).float()
         
         print('-' * 20)
         print(img.shape)
