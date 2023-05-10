@@ -58,7 +58,7 @@ class SegmentationModel(nn.Module):
     """
     Segmentation model that combines the encoder and decoder.
     """
-    def __init__(self, num_classes):
+    def __init__(self, num_classes=2):
         super().__init__()
         self.encoder = Encoder()
         self.decoder = Decoder(2048, num_classes)
