@@ -129,7 +129,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 class SegmentationModel(nn.Module):
-    def __init__(self, num_classes=1):
+    def __init__(self, num_classes=2):
         super(SegmentationModel, self).__init__()
         self.num_classes = num_classes
         self.backbone = nn.Sequential(
