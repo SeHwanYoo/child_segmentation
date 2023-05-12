@@ -69,17 +69,17 @@ def train(t_model, t_train_loader, t_optimizer):
         t_optimizer.step()
         
         # Compute accuracy metrics for this batch, weighting by uncertainty
-        correct_pixels = (preds == masks).sum(dim=(1, 2)).float()
-        weighted_correct_pixels = (correct_pixels * uncertainty).sum()
-        total_correct_pixels += weighted_correct_pixels.item()
-        total_pixels += np.prod(masks.shape)
+        # correct_pixels = (preds == masks).sum(dim=(1, 2)).float()
+        # weighted_correct_pixels = (correct_pixels * uncertainty).sum()
+        # total_correct_pixels += weighted_correct_pixels.item()
+        # total_pixels += np.prod(masks.shape)
         
         # Update running loss
         # running_loss += weighted_loss.item() * images.size(0)
         
     # Compute loss and accuracy metrics for the epoch
     # epoch_loss = running_loss / len(t_train_loader.dataset)
-    pixel_accuracy = total_correct_pixels / total_pixels
+    # pixel_accuracy = total_correct_pixels / total_pixels
     
     # print(f"Epoch {epoch+1}/{total_epochs} | Train Loss: {epoch_loss:.4f} | Train Pixel Accuracy: {pixel_accuracy:.4f}")
 
