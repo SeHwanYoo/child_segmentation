@@ -53,7 +53,7 @@ def train(t_model, t_train_loader, t_optimizer):
         masks = masks.to(device)
         
         # Generate predictions from the model and compute total uncertainty
-        logits, uncertainty = t_model(images)
+        logits = t_model(images)
         preds = torch.argmax(logits, dim=1)
         
         t_optimizer.zero_grad()
