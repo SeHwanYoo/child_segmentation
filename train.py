@@ -37,7 +37,8 @@ def parse_args():
     
     return args
 
-def train(t_model, t_train_loader, t_optimizer, t_loss_function):    
+# def train(t_model, t_train_loader, t_optimizer, t_loss_function):    
+def train(t_model, t_train_loader, t_optimizer):    
     t_model.train()
     # t_loss = 0
     # t_count = 0
@@ -55,14 +56,16 @@ def train(t_model, t_train_loader, t_optimizer, t_loss_function):
         logits, uncertainty = t_model(images)
         preds = torch.argmax(logits, dim=1)
         
+        t_optimizer.zero_grad()
+        
         # Compute loss, weighting by uncertainty
-        loss = t_loss_function(logits, masks)
+        loss = t_model.compute_loss(logits, masks)
         # loss = models.bayesian_loss(logits, masks)
-        weighted_loss = (loss * uncertainty).mean()
+        # weighted_loss = (loss * uncertainty).mean()
         
         # Backpropagate and update parameters
-        t_optimizer.zero_grad()
-        weighted_loss.backward()
+        loss.backward()
+        
         t_optimizer.step()
         
         # Compute accuracy metrics for this batch, weighting by uncertainty
@@ -72,13 +75,13 @@ def train(t_model, t_train_loader, t_optimizer, t_loss_function):
         total_pixels += np.prod(masks.shape)
         
         # Update running loss
-        running_loss += weighted_loss.item() * images.size(0)
+        # running_loss += weighted_loss.item() * images.size(0)
         
     # Compute loss and accuracy metrics for the epoch
-    epoch_loss = running_loss / len(t_train_loader.dataset)
+    # epoch_loss = running_loss / len(t_train_loader.dataset)
     pixel_accuracy = total_correct_pixels / total_pixels
     
-    print(f"Epoch {epoch+1}/{total_epochs} | Train Loss: {epoch_loss:.4f} | Train Pixel Accuracy: {pixel_accuracy:.4f}")
+    # print(f"Epoch {epoch+1}/{total_epochs} | Train Loss: {epoch_loss:.4f} | Train Pixel Accuracy: {pixel_accuracy:.4f}")
 
     # return pred_array, label_array
 
@@ -130,7 +133,7 @@ def main():
     Test_Dataset = datasets.SegDataset(path, ints=ints[args.ints], grds=grds[args.grds],is_test=True)
     test_dataset = DataLoader(Test_Dataset, batch_size=args.batch_size, shuffle=False, num_workers=4, )
   
-    loss_function = models.BayesianLoss()
+    # loss_function = models.BayesianLoss()
     
     model = models.SegmentationModel().to(device)
     learning_rate = 0.0001
@@ -142,7 +145,8 @@ def main():
     # train
     for _ in range(1, args.epochs+1):
         # r_pred, r_label = train(model, train_dataset, optimizer, loss_function, scheduler)
-       train(model, train_dataset, optimizer, loss_function)
+    #    train(model, train_dataset, optimizer, loss_function)
+       train(model, train_dataset, optimizer)
     
     
     # eval 
