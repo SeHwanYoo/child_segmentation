@@ -38,7 +38,7 @@ class SegDataset(Dataset):
         mask = np.array(mask)
         
         img = cv2.resize(img, (self.res, self.res))
-        mask = cv2.resize(mask, (self.res, self.res), interpolation=cv2.INTER_NEAREST)
+        mask = cv2.resize(mask, (self.res, self.res))
         
         img = img.astype(np.float32) / 255.0
         mask = np.where(mask > 0, 1.0, 0.0)
