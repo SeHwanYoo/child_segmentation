@@ -125,31 +125,24 @@ class UNet(nn.Module):
     
 #     return total_loss
 
-import torch
-import torch.nn as nn
-import torch.nn.functional as F
+class UncertaintyLoss(nn.Module):
+    def __init__(self):
+        super(UncertaintyLoss, self).__init__()
 
-class UncertaintySegmentationLoss(nn.Module):
-    def __init__(self, uncertainty_weight=0.5):
-        super(UncertaintySegmentationLoss, self).__init__()
-        self.uncertainty_weight = uncertainty_weight
-        
-    def forward(self, predictions, targets):
-        
-        targets = targets.long()
-        
-        # Compute pixel-wise cross-entropy loss
-        ce_loss = F.cross_entropy(predictions, targets)
-        
-        # Compute uncertainty loss
-        uncertainty_map = predictions[:, 1]  # Assuming class 1 is the foreground
-        uncertainty_targets = (targets > 0).float()  # Binary targets for uncertainty loss
-        uncertainty_loss = nn.BCEWithLogitsLoss()(uncertainty_map, uncertainty_targets)
-        
-        # Combine losses
-        loss = ce_loss + (self.uncertainty_weight * uncertainty_loss)
-        
-        return loss
+    def forward(self, preds, targets, epistemic_uncertainty, aleatoric_uncertainty):
+        # Calculate the squared difference between preds and targets
+        squared_diff = (preds - targets) ** 2
+
+        # Calculate the epistemic uncertainty loss
+        epistemic_loss = torch.mean(epistemic_uncertainty * squared_diff)
+
+        # Calculate the aleatoric uncertainty loss
+        aleatoric_loss = torch.mean(aleatoric_uncertainty)
+
+        # Calculate the total loss as a combination of epistemic and aleatoric losses
+        total_loss = epistemic_loss + aleatoric_loss
+
+        return total_loss
 
 
 

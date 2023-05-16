@@ -136,7 +136,7 @@ def main():
     test_dataset = DataLoader(Test_Dataset, batch_size=args.batch_size, shuffle=False, num_workers=3, )
   
     # loss_func = nn.BCEWithLogitsLoss()
-    loss_func = models.UncertaintySegmentationLoss()
+    loss_func = models.UncertaintyLoss()
     
     # model = models.SegmentationModel().to(device)
     model = models.UNet(n_channels=3, n_classes=1).to(device)
