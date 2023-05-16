@@ -103,7 +103,7 @@ class UNet(nn.Module):
         x = self.up4(x, x1)
         x = self.outc(x)
         x = torch.sigmoid(x)
-        x = torch.squeeze(x)
+        # x = torch.squeeze(x)
         return x
 
     
