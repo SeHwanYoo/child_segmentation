@@ -37,8 +37,8 @@ def parse_args():
     
     return args
 
-# def train(t_model, t_train_loader, t_optimizer, t_loss_function):    
-def train(t_model, t_train_loader, t_optimizer):    
+def train(t_model, t_train_loader, t_optimizer, t_loss_func):    
+# def train(t_model, t_train_loader, t_optimizer):    
     t_model.train()
     # t_loss = 0
     # t_count = 0
@@ -60,7 +60,7 @@ def train(t_model, t_train_loader, t_optimizer):
         
         # Compute loss, weighting by uncertainty
         # loss = t_model.compute_loss(logits, masks)
-        loss = nn.BCEWithLogitsLoss(preds, masks)
+        loss = t_loss_func(preds, masks)
         # loss = models.bayesian_loss(logits, masks)
         # weighted_loss = (loss * uncertainty).mean()
         
@@ -134,7 +134,7 @@ def main():
     Test_Dataset = datasets.SegDataset(path, ints=ints[args.ints], grds=grds[args.grds],is_test=True)
     test_dataset = DataLoader(Test_Dataset, batch_size=args.batch_size, shuffle=False, num_workers=4, )
   
-    # loss_function = models.BayesianLoss()
+    loss_func = nn.CrossEntropyLoss()
     
     model = models.SegmentationModel().to(device)
     learning_rate = 0.0001
@@ -146,8 +146,8 @@ def main():
     # train
     for _ in range(1, args.epochs+1):
         # r_pred, r_label = train(model, train_dataset, optimizer, loss_function, scheduler)
-    #    train(model, train_dataset, optimizer, loss_function)
-       train(model, train_dataset, optimizer)
+       train(model, train_dataset, optimizer, loss_func)
+    #    train(model, train_dataset, optimizer)
     
     
     # eval 
