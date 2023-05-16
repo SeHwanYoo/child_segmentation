@@ -4,6 +4,7 @@ import os
 from glob import glob
 from PIL import Image
 import numpy as np
+import cv2
 
 class SegDataset(Dataset):
     def __init__(self, path, ints, grds, transform=None, is_test=False):
@@ -30,21 +31,21 @@ class SegDataset(Dataset):
         return len(self.img_list)
 
     def __getitem__(self, index):      
-        img = Image.open(self.img_list[index]).resize((self.res, self.res))
-        mask = Image.open(self.mask_list[index]).resize((self.res, self.res))
+        img = Image.open(self.img_list[index])
+        mask = Image.open(self.mask_list[index])
         
         img = np.array(img)
         mask = np.array(mask)
         
+        img = cv2.resize(img, (self.res, self.res))
+        mask = cv2.resize(mask, (self.res, self.res), interpolation=cv2.INTER_NEAREST)
+        
+        img = img.astype(np.float32) / 255.0
+        mask = np.where(mask > 0, 1.0, 0.0)
+        
         print('-' * 20)
         print(img.shape)
         print(mask.shape)
-        
-        # mask[mask==255.0] = 1.0
-        mask[mask > 0] = 1.0 
-        
-        # if self.transform is not None:
-        #     img, mask = self.transform(image=img, mask=mask)
 
         img = torch.tensor(img).permute(2, 0, 1).float()
         mask = torch.tensor(mask).unsqueeze(0).float()
