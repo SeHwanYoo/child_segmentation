@@ -44,7 +44,8 @@ class SegDataset(Dataset):
         mask = np.where(mask > 0, 1.0, 0.0)
 
         img = torch.tensor(img).permute(2, 0, 1).float()
-        mask = torch.tensor(mask).unsqueeze(0).float()
+        # mask = torch.tensor(mask).unsqueeze(0).float()
+        mask = torch.tensor(mask).permute(2, 0, 1).float()
         
         return img, mask
        
