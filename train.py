@@ -132,7 +132,9 @@ def main():
   
     loss_func = nn.BCEWithLogitsLoss()
     
-    model = models.SegmentationModel().to(device)
+    # model = models.SegmentationModel().to(device)
+    model = models.UNet(n_channels=3, n_classes=2).float()
+    
     learning_rate = 0.0001
     
     
