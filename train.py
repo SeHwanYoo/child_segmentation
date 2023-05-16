@@ -133,7 +133,7 @@ def main():
     loss_func = nn.BCEWithLogitsLoss()
     
     # model = models.SegmentationModel().to(device)
-    model = models.UNet(n_channels=3, n_classes=2).float()
+    model = models.UNet(n_channels=3, n_classes=2).to(device)
     
     learning_rate = 0.0001
     
@@ -149,25 +149,25 @@ def main():
     
     
     # eval 
-    random_seed = 1234
-    torch.manual_seed(random_seed)
-    np.random.seed(random_seed)
-    random.seed(random_seed)
+    # random_seed = 1234
+    # torch.manual_seed(random_seed)
+    # np.random.seed(random_seed)
+    # random.seed(random_seed)
     
-    pixel_accuracy_list = []
-    for i in range(args.eval_epocs):
+    # pixel_accuracy_list = []
+    # for i in range(args.eval_epocs):
         
-        torch.manual_seed(random_seed + i)
-        np.random.seed(random_seed + i)
-        random.seed(random_seed + i)
+    #     torch.manual_seed(random_seed + i)
+    #     np.random.seed(random_seed + i)
+    #     random.seed(random_seed + i)
         
-        pixel_accuracy = evaluate(model, test_dataset) 
-        pixel_accuracy_list.append(pixel_accuracy)
+    #     pixel_accuracy = evaluate(model, test_dataset) 
+    #     pixel_accuracy_list.append(pixel_accuracy)
         
-    mean_pixel_accuracy = np.mean(pixel_accuracy_list)
-    stddev_pixel_accuracy = np.std(pixel_accuracy_list)
+    # mean_pixel_accuracy = np.mean(pixel_accuracy_list)
+    # stddev_pixel_accuracy = np.std(pixel_accuracy_list)
     
-    print(f"Pixel accuracy: {mean_pixel_accuracy:.4f} +/- {stddev_pixel_accuracy:.4f}")
+    # print(f"Pixel accuracy: {mean_pixel_accuracy:.4f} +/- {stddev_pixel_accuracy:.4f}")
 
 if __name__ == '__main__':
     main()
