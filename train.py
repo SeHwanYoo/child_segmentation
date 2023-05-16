@@ -40,7 +40,7 @@ def parse_args():
 def train(t_model, t_train_loader, t_optimizer, t_loss_func, epoch):
 # def train(t_model, t_train_loader, t_optimizer):    
     t_model.train()
-    
+    train_loss = 0.0
     # epoch = 0 
     total_epochs = len(t_train_loader) 
     for images, masks in tqdm(t_train_loader):
