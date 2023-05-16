@@ -102,7 +102,9 @@ class UNet(nn.Module):
         x = self.up3(x, x2)
         x = self.up4(x, x1)
         x = self.outc(x)
-        return torch.sigmoid(x)
+        x = torch.sigmoid(x)
+        x = torch.squeeze(x)
+        return x
 
     
 # def compute_loss(self, x, y_true):
