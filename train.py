@@ -40,10 +40,6 @@ def parse_args():
 def train(t_model, t_train_loader, t_optimizer, t_loss_func):    
 # def train(t_model, t_train_loader, t_optimizer):    
     t_model.train()
-    # t_loss = 0
-    # t_count = 0
-    # pred_array = np.array([])
-    # label_array = np.array([])
     
     epoch = 0 
     total_epochs = len(t_train_loader) 
@@ -134,7 +130,7 @@ def main():
     Test_Dataset = datasets.SegDataset(path, ints=ints[args.ints], grds=grds[args.grds],is_test=True)
     test_dataset = DataLoader(Test_Dataset, batch_size=args.batch_size, shuffle=False, num_workers=4, )
   
-    loss_func = nn.CrossEntropyLoss()
+    loss_func = nn.BCEWithLogitsLoss()
     
     model = models.SegmentationModel().to(device)
     learning_rate = 0.0001
