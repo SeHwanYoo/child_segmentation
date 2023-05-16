@@ -60,7 +60,7 @@ def train(t_model, t_train_loader, t_optimizer):
         
         # Compute loss, weighting by uncertainty
         # loss = t_model.compute_loss(logits, masks)
-        loss = nn.BCEWithLogitsLoss(logits, masks)
+        loss = nn.BCEWithLogitsLoss(preds, masks)
         # loss = models.bayesian_loss(logits, masks)
         # weighted_loss = (loss * uncertainty).mean()
         
