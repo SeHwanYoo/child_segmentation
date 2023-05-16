@@ -54,13 +54,13 @@ def train(t_model, t_train_loader, t_optimizer, t_loss_func):
         
         # Generate predictions from the model and compute total uncertainty
         logits = t_model(images)
-        preds = torch.argmax(logits, dim=1)
+        # preds = torch.argmax(logits, dim=1)
         
         t_optimizer.zero_grad()
         
         # Compute loss, weighting by uncertainty
         # loss = t_model.compute_loss(logits, masks)
-        loss = t_loss_func(preds, masks)
+        loss = t_loss_func(logits, masks)
         # loss = models.bayesian_loss(logits, masks)
         # weighted_loss = (loss * uncertainty).mean()
         
