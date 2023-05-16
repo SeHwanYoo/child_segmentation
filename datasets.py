@@ -42,17 +42,9 @@ class SegDataset(Dataset):
         
         img = img.astype(np.float32) / 255.0
         mask = np.where(mask > 0, 1.0, 0.0)
-        
-        print('-' * 20)
-        print(img.shape)
-        print(mask.shape)
 
         img = torch.tensor(img).permute(2, 0, 1).float()
         mask = torch.tensor(mask).unsqueeze(0).float()
-        
-        print('=' * 20)
-        print(img.shape)
-        print(mask.shape)
         
         return img, mask
        
