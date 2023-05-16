@@ -125,6 +125,29 @@ class UNet(nn.Module):
     
 #     return total_loss
 
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+
+class UncertaintySegmentationLoss(nn.Module):
+    def __init__(self, uncertainty_weight=0.5):
+        super(UncertaintySegmentationLoss, self).__init__()
+        self.uncertainty_weight = uncertainty_weight
+        
+    def forward(self, predictions, targets):
+        # Compute pixel-wise cross-entropy loss
+        ce_loss = F.cross_entropy(predictions, targets)
+        
+        # Compute uncertainty loss
+        uncertainty_map = predictions[:, 1]  # Assuming class 1 is the foreground
+        uncertainty_loss = torch.mean(uncertainty_map)
+        
+        # Combine losses
+        loss = ce_loss + (self.uncertainty_weight * uncertainty_loss)
+        
+        return loss
+
+
 
 def dice_coefficient(predicted, target):
     smooth = 1e-5

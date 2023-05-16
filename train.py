@@ -58,7 +58,7 @@ def train(t_model, t_train_loader, t_optimizer, t_loss_func, epoch):
         loss = t_loss_func(preds, masks)
         # loss = models.bayesian_loss(logits, masks)
         # weighted_loss = (loss * uncertainty).mean()
-        predicted_masks = F.softmax(preds, dim=1).argmax(dim=1)
+        # predicted_masks = F.softmax(preds, dim=1).argmax(dim=1)
         
         # Backpropagate and update parameters
         loss.backward()
@@ -135,7 +135,8 @@ def main():
     Test_Dataset = datasets.SegDataset(path, ints=ints[args.ints], grds=grds[args.grds],is_test=True)
     test_dataset = DataLoader(Test_Dataset, batch_size=args.batch_size, shuffle=False, num_workers=3, )
   
-    loss_func = nn.BCEWithLogitsLoss()
+    # loss_func = nn.BCEWithLogitsLoss()
+    loss_func = models.UncertaintySegmentationLoss()
     
     # model = models.SegmentationModel().to(device)
     model = models.UNet(n_channels=3, n_classes=1).to(device)
@@ -147,7 +148,7 @@ def main():
     # scheduler = optim.lr_scheduler.LambdaLR(optimizer=optimizer, lr_lambda=lambda epoch: 0.95 ** epoch, last_epoch=-1, verbose=False)
 
     # train
-    for epoch in range(1, args.epochs+1):
+    for epoch in range(args.epochs):
         # r_pred, r_label = train(model, train_dataset, optimizer, loss_function, scheduler)
        train(model, train_dataset, optimizer, loss_func, epoch)
     #    train(model, train_dataset, optimizer)
