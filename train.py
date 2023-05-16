@@ -37,33 +37,35 @@ def parse_args():
     
     return args
 
-def train(t_model, t_train_loader, t_optimizer, t_loss_func):    
+def train(t_model, t_train_loader, t_optimizer, t_loss_func, epoch):
 # def train(t_model, t_train_loader, t_optimizer):    
     t_model.train()
     
-    epoch = 0 
+    # epoch = 0 
     total_epochs = len(t_train_loader) 
     for images, masks in tqdm(t_train_loader):
         
         images = images.to(device)
         masks = masks.to(device)
         
-        # Generate predictions from the model and compute total uncertainty
-        logits = t_model(images)
-        # preds = torch.argmax(logits, dim=1)
+        preds = t_model(images)
         
         t_optimizer.zero_grad()
         
         # Compute loss, weighting by uncertainty
         # loss = t_model.compute_loss(logits, masks)
-        loss = t_loss_func(logits, masks)
+        loss = t_loss_func(preds, masks)
         # loss = models.bayesian_loss(logits, masks)
         # weighted_loss = (loss * uncertainty).mean()
         
         # Backpropagate and update parameters
         loss.backward()
-        
         t_optimizer.step()
+        
+        train_loss += loss.item() * images.size(0)
+        
+    train_loss /= len(t_train_loader)
+
         
         # Compute accuracy metrics for this batch, weighting by uncertainty
         # correct_pixels = (preds == masks).sum(dim=(1, 2)).float()
@@ -78,7 +80,8 @@ def train(t_model, t_train_loader, t_optimizer, t_loss_func):
     # epoch_loss = running_loss / len(t_train_loader.dataset)
     # pixel_accuracy = total_correct_pixels / total_pixels
     
-    # print(f"Epoch {epoch+1}/{total_epochs} | Train Loss: {epoch_loss:.4f} | Train Pixel Accuracy: {pixel_accuracy:.4f}")
+    print(f"Epoch [{epoch+1}/{total_epochs}] | Train Loss: {train_loss:.4f}")
+
 
     # return pred_array, label_array
 
@@ -142,9 +145,9 @@ def main():
     # scheduler = optim.lr_scheduler.LambdaLR(optimizer=optimizer, lr_lambda=lambda epoch: 0.95 ** epoch, last_epoch=-1, verbose=False)
 
     # train
-    for _ in range(1, args.epochs+1):
+    for epoch in range(1, args.epochs+1):
         # r_pred, r_label = train(model, train_dataset, optimizer, loss_function, scheduler)
-       train(model, train_dataset, optimizer, loss_func)
+       train(model, train_dataset, optimizer, loss_func, epoch)
     #    train(model, train_dataset, optimizer)
     
     
