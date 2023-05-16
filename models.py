@@ -124,3 +124,11 @@ class UNet(nn.Module):
 #     total_loss = loss + aleatoric_uncertainty + epistemic_uncertainty
     
 #     return total_loss
+
+
+def dice_coefficient(predicted, target):
+    smooth = 1e-5
+    intersection = torch.sum(predicted * target)
+    union = torch.sum(predicted) + torch.sum(target)
+    dice = (2.0 * intersection + smooth) / (union + smooth)
+    return dice.item()

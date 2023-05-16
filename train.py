@@ -3,6 +3,8 @@ from torch.utils.data import DataLoader, WeightedRandomSampler
 import torch.nn as nn
 import torch.optim as optim
 import torchvision.transforms as transforms
+import torch.nn.functional as F
+
 
 import numpy as np
 from tqdm import tqdm
@@ -38,12 +40,11 @@ def parse_args():
     return args
 
 def train(t_model, t_train_loader, t_optimizer, t_loss_func, epoch):
-# def train(t_model, t_train_loader, t_optimizer):    
     t_model.train()
     train_loss = 0.0
-    # epoch = 0 
+    
     total_epochs = len(t_train_loader) 
-    for images, masks in tqdm(t_train_loader):
+    for images, masks in t_train_loader:
         
         images = images.to(device)
         masks = masks.to(device)
@@ -57,6 +58,7 @@ def train(t_model, t_train_loader, t_optimizer, t_loss_func, epoch):
         loss = t_loss_func(preds, masks)
         # loss = models.bayesian_loss(logits, masks)
         # weighted_loss = (loss * uncertainty).mean()
+        predicted_masks = F.softmax(preds, dim=1).argmax(dim=1)
         
         # Backpropagate and update parameters
         loss.backward()
@@ -128,10 +130,10 @@ def main():
     ])
     
     Train_Dataset = datasets.SegDataset(path, ints=ints[args.ints], grds=grds[args.grds], transform=transform, is_test=False)
-    train_dataset = DataLoader(Train_Dataset, batch_size=args.batch_size, shuffle=True, num_workers=4, )
+    train_dataset = DataLoader(Train_Dataset, batch_size=args.batch_size, shuffle=True, num_workers=3, )
     
     Test_Dataset = datasets.SegDataset(path, ints=ints[args.ints], grds=grds[args.grds],is_test=True)
-    test_dataset = DataLoader(Test_Dataset, batch_size=args.batch_size, shuffle=False, num_workers=4, )
+    test_dataset = DataLoader(Test_Dataset, batch_size=args.batch_size, shuffle=False, num_workers=3, )
   
     loss_func = nn.BCEWithLogitsLoss()
     
