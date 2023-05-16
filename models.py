@@ -135,12 +135,16 @@ class UncertaintySegmentationLoss(nn.Module):
         self.uncertainty_weight = uncertainty_weight
         
     def forward(self, predictions, targets):
+        
+        targets = targets.long()
+        
         # Compute pixel-wise cross-entropy loss
         ce_loss = F.cross_entropy(predictions, targets)
         
         # Compute uncertainty loss
         uncertainty_map = predictions[:, 1]  # Assuming class 1 is the foreground
-        uncertainty_loss = torch.mean(uncertainty_map)
+        uncertainty_targets = (targets > 0).float()  # Binary targets for uncertainty loss
+        uncertainty_loss = nn.BCEWithLogitsLoss()(uncertainty_map, uncertainty_targets)
         
         # Combine losses
         loss = ce_loss + (self.uncertainty_weight * uncertainty_loss)
