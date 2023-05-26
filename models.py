@@ -105,6 +105,16 @@ class UNet(nn.Module):
         x = torch.sigmoid(x)
         # x = torch.squeeze(x)
         return x
+    
+def total_loss(outputs, log_vars, targets):
+    ce_loss = 0
+    epistemic_loss = 0
+    aleatoric_loss = 0
+    for i in range(outputs.shape[1]):
+        ce_loss += F.cross_entropy(outputs[:, i, :, :], targets[:, :, :], reduction='mean')
+        epistemic_loss += 0.5 * torch.mean(log_vars[:, i, :, :])
+        aleatoric_loss += 0.5 * torch.mean(torch.exp(-log_vars[:, i, :, :]) * (outputs[:, i, :, :] - targets[:, :, :])**2)
+    return ce_loss + epistemic_loss + aleatoric_loss
 
     
 # def compute_loss(self, x, y_true):
@@ -125,24 +135,24 @@ class UNet(nn.Module):
     
 #     return total_loss
 
-class UncertaintyLoss(nn.Module):
-    def __init__(self):
-        super(UncertaintyLoss, self).__init__()
+# class UncertaintyLoss(nn.Module):
+#     def __init__(self):
+#         super(UncertaintyLoss, self).__init__()
 
-    def forward(self, preds, targets, epistemic_uncertainty, aleatoric_uncertainty):
-        # Calculate the squared difference between preds and targets
-        squared_diff = (preds - targets) ** 2
+#     def forward(self, preds, targets, epistemic_uncertainty, aleatoric_uncertainty):
+#         # Calculate the squared difference between preds and targets
+#         squared_diff = (preds - targets) ** 2
 
-        # Calculate the epistemic uncertainty loss
-        epistemic_loss = torch.mean(epistemic_uncertainty * squared_diff)
+#         # Calculate the epistemic uncertainty loss
+#         epistemic_loss = torch.mean(epistemic_uncertainty * squared_diff)
 
-        # Calculate the aleatoric uncertainty loss
-        aleatoric_loss = torch.mean(aleatoric_uncertainty)
+#         # Calculate the aleatoric uncertainty loss
+#         aleatoric_loss = torch.mean(aleatoric_uncertainty)
 
-        # Calculate the total loss as a combination of epistemic and aleatoric losses
-        total_loss = epistemic_loss + aleatoric_loss
+#         # Calculate the total loss as a combination of epistemic and aleatoric losses
+#         total_loss = epistemic_loss + aleatoric_loss
 
-        return total_loss
+#         return total_loss
 
 
 
